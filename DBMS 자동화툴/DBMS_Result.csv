@@ -1,0 +1,93 @@
+﻿"항목번호","항목명","결과","상세내용","진단명령어"
+"1.1","불필요한 계정 확인","수동확인필요","수동 확인 필요: 위 목록에서 불필요한 계정이 있는지 직접 확인하고 조치해야 합니다.","select username, account_status from dba_users where account_status='OPEN' and username not in ('AWR_STAGE','AUDSYS','CSMIG','CTXSYS','DIP','DBSNMP','DEMO','DGPDB_INT','DMSYS','DSSYS','DVF','DVSYS','EXFSYS','GGSYS','GSMADMIN_INTERNAL','GSMCATUSER','GSMUSER','LBACSYS','MDSYS','MGMT_VIEW','OLAPSYS','OWBSYS','ORACLE_OCM','ORDDATA','ORDPLUGINS','ORDSYS','OUTLN','SI_INFORMTN_SCHEMA','SYS','SYSBACKUP','SYSDG','SYSKM','SYSRAC','SYSMAN','SYSTEM','TRACESVR','TSMSYS','WK_TEST','WKSYS','WKPROXY','WMSYS','XDB','ODM','PERFSTAT','IMP_FULL_DATABASE','FLOWS_030000')
+...
+..."
+"1.2","무제한 로그인 시도 차단 (FAILED_LOGIN_ATTEMPTS)","양호","양호: 모든 프로파일이 로그인 실패 횟수 제한을 충족합니다.","select profile, limit from dba_profiles where resource_name = 'FAILED_LOGIN_ATTEMPTS' order by profile
+
+PROFILE              LIMIT
+-------------------- ----------
+DEFAULT              10
+ORA_CIS_PROFILE      5
+ORA_STIG_PROFILE     3"
+"1.3","패스워드 주기적 변경 (PASSWORD_LIFE_TIME)","양호","양호: 모든 프로파일의 패스워드 만료 기간이 60일 이하로 설정되었습니다.","select resource_name, limit from user_password_limits where resource_name in ('PASSWORD_LIFE_TIME')
+
+RESOURCE_NAME        LIMIT
+-------------------- ----------
+PASSWORD_LIFE_TIME   60"
+"1.4","패스워드 복잡도 설정 (PASSWORD_VERIFY_FUNCTION)","양호","양호: 패스워드 검증 함수가 설정되지 않은 프로파일이 없습니다.","select profile, limit from dba_profiles where resource_name = 'PASSWORD_VERIFY_FUNCTION' order by profile
+
+PROFILE              LIMIT
+-------------------- ------------------------------
+DEFAULT              ORA12C_VERIFY_FUNCTION
+ORA_CIS_PROFILE      ORA12C_VERIFY_FUNCTION
+ORA_STIG_PROFILE     ORA12C_STIG_VERIFY_FUNCTION"
+"1.5","취약한 패스워드 사용 점검 (인터뷰)","수동확인필요","수동 확인 필요: 담당자 인터뷰를 통해 취약한 패스워드 관리 정책을 확인해야 합니다.",""
+"1.6","OS DBA 그룹 멤버 확인","수동확인필요","수동 확인 필요: 불필요한 계정이 ORA_DBA 그룹에 존재합니다. (대상: infra-db, 명령을 잘 실행했습니다.","net localgroup ""ORA_DBA""
+별칭     ORA_DBA
+설명     ORA_DBA
+
+구성원
+
+-------------------------------------------------------------------------------
+infra-db
+NT AUTHORITY\SYSTEM
+명령을 잘 실행했습니다."
+"2.1","개발 및 운영 시스템 분리 사용 (인터뷰)","수동확인필요","수동 확인 필요: 담당자 인터뷰를 통해 시스템 분리 정책을 확인해야 합니다.",""
+"2.2","Public 롤에 대한 권한 제한","수동확인필요","수동 확인 필요: PUBLIC 롤에 과도한 실행/수정 권한이 존재할 수 있습니다. 점검이 필요합니다.","select owner,table_name,privilege from dba_tab_privs where grantee='PUBLIC' and owner not in ('SYS','CTXSYS','MDSYS','ODM','OLAPSYS','TSMSYS','ORDPLUGINS','ORDSYS','SYSTEM','WKSYS','WMSYS','XDB','LBACSYS','PERFSTAT','SYSMAN','DMSYS','EXFSYS','WK_TEST','IMP_FULL_DATABASE','FLOWS_030000','MGMT_VIEW')
+...
+..."
+"2.3","SYS.LINK$ 테이블 접근 제한","양호","양호: 불필요한 계정에 권한이 없습니다.","select grantee, privilege from dba_tab_privs where owner='SYS' and table_name='LINK$' and grantee not in ('SYS','SYSTEM','DBA') order by grantee, privilege"
+"2.4","SYSDBA 권한 제한","양호","양호: SYS 외 SYSDBA 권한 계정이 없습니다.","select username,sysdba,sysoper from v$pwfile_users where username not in (select grantee from dba_role_privs where granted_role='DBA' and username !='INTERNAL' and sysdba='TRUE')"
+"2.5","DBA 권한 제한","수동확인필요","수동 확인 필요: 기본 관리자 외 DBA 롤을 가진 계정이 있는지 확인해야 합니다.","select grantee from dba_role_privs where granted_role='DBA' and grantee not in ('SYS','SYSTEM','WKSYS','CTXSYS','CSTA','SYSMAN')
+
+GRANTEE
+------------------------------
+C##TEST"
+"2.6","with grant option 사용 제한","양호","양호: WITH GRANT OPTION 권한이 적절하게 관리되고 있습니다.","select grantee,owner,table_name,grantable from dba_tab_privs where grantable='YES' and owner not in (select distinct owner from dba_objects) and grantee not in (select grantee from dba_role_privs where granted_role='DBA') order by grantee"
+"2.7","with admin option 사용 제한","수동확인필요","수동 확인 필요: 불필요한 사용자에게 WITH ADMIN OPTION이 부여된 시스템 권한이 있습니다.","select grantee,privilege from dba_sys_privs where grantee not in ('SYS','SYSTEM','AQ_ADMINISTRATOR_ROLE','DBA','MDSYS','LBACSYS','SCHEDULER_ADMIN',' MSYS') and admin_option='YES' and grantee not in (select grantee from dba_role_privs where granted_role='DBA')
+...
+..."
+"2.8","SYS 계정 인증 방식 설정 (SQLNET.AUTHENTICATION_SERVICES)","양호","양호: OS 인증(NTS)이 아닌 데이터베이스 인증(NONE)을 사용합니다.","host type ""C:\app\Administrator\product\21c\dbhomeXE\network\admin\sqlnet.ora"" 2>nul | findstr /I ""SQLNET.AUTHENTICATION_SERVICES"""
+"2.9","CREATE ANY DIRECTORY 권한 제한","양호","양호: CREATE ANY DIRECTORY 권한이 적절하게 관리되고 있습니다.","select grantee,privilege from dba_sys_privs where privilege='CREATE ANY DIRECTORY' and grantee not in('DBA','IMP_FULL_DATABASE','WKSYS','SYS','SYSDBA')
+
+GRANTEE              PRIVILEGE
+-------------------- ------------------------------
+SYSBACKUP            CREATE ANY DIRECTORY"
+"3.1","백업 관리 (인터뷰)","수동확인필요","수동 확인 필요: 담당자 인터뷰를 통해 백업 정책 및 수행 여부를 확인해야 합니다.",""
+"3.2","PL/SQL Package의 Public Role 점검","수동확인필요","수동 확인 필요: PUBLIC 롤에 위험한 패키지 실행 권한이 부여되어 있습니다.","select grantee, owner, grantor, table_name, privilege from dba_tab_privs where grantee='PUBLIC' and privilege='EXECUTE' and table_name in ('UTL_SMTP','UTL_TCP','UTL_HTTP','UTL_FILE','DBMS_RANDOM','DBMS_LOB','DBMS_SQL','DBMS_JOB','DBMS_BACKUP_RESTORE','DBMS_OBFUSCATION_TOOLKIT','UTL_INADDR')
+...
+..."
+"3.3","Listener 보안 설정 여부","양호","양호: Oracle 12.1 이상 버전은 Local OS 인증을 사용하므로 보안 설정이 필수가 아닙니다.","1. Listener 상태 확인:
+C:\> lsnrctl status
+
+2. 설정 파일 확인:
+host findstr /I /C:""PASSWORDS_"" /C:""ADMIN_RESTRICTIONS_"" ""C:\app\Administrator\product\21c\dbhomeXE\network\admin\listener.ora"""
+"3.4","DB 접속 IP 통제","취약","취약: IP 차단이 설정되어 있지 않습니다.","host findstr /I ""NODES"" ""C:\app\Administrator\product\21c\dbhomeXE\network\admin\sqlnet.ora"""
+"3.5","로그 저장 주기","수동확인필요","수동 확인 필요: 담당자 인터뷰를 통해 로그 저장 주기를 확인해야 합니다.",""
+"3.6","세션 IDLE_TIMEOUT 설정 (IDLE_TIME)","양호","양호: 모든 프로파일의 세션 IDLE_TIMEOUT이 5분 이하로 설정되었습니다.","select profile,resource_name,limit from dba_profiles where resource_name = 'IDLE_TIME'
+
+PROFILE              RESOURCE_NAME   LIMIT
+-------------------- --------------- ----------
+DEFAULT              IDLE_TIME       5
+ORA_CIS_PROFILE      IDLE_TIME       DEFAULT
+ORA_STIG_PROFILE     IDLE_TIME       5"
+"4.1","SQL*PLUS 명령 히스토리 검사","양호","양호: PowerShell 히스토리 파일의 접근 권한이 소유자 위주로 적절하게 설정되어 있습니다.","host icacls ""C:\Users\Administrator\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt"""
+"4.2","Initialization 파일 접근 권한 설정","양호","양호: 초기화 파일의 접근 권한이 적절하게 설정되어 있습니다.","host icacls ""C:\app\Administrator\product\21c\dbhomeXE\database\init*.ora""
+host icacls ""C:\app\Administrator\product\21c\dbhomeXE\database\spfile*.ora"""
+"4.3","Oracle Password 파일 접근 권한 설정","양호","양호: Oracle 패스워드 파일의 접근 권한이 적절하게 설정되어 있습니다.","host icacls ""C:\app\Administrator\product\21c\dbhomeXE\database\PWD*.ora"""
+"4.4","Alert Log 파일 접근 제한 (자동 진단)","양호","양호: 불필요 그룹 권한이 확인되지 않았습니다. (Administrators/SYSTEM/Owner/Oracle 서비스 계정만 존재)","icacls ""C:\app\Administrator\product\21c\diag\rdbms\xe\xe\trace""
+...
+...  icacls ""C:\app\Administrator\product\21c\diag\rdbms\xe\xe\trace\alert_xe.log"""
+"4.5","Trace Log 파일 접근 제한 (자동 진단)","양호","양호: 불필요 그룹 권한이 확인되지 않았습니다. (Administrators/SYSTEM/Owner/Oracle 서비스 계정만 존재)","icacls ""C:\app\Administrator\product\21c\diag\rdbms\xe\xe\trace""
+...
+...  icacls ""C:\app\Administrator\product\21c\diag\rdbms\xe\xe\trace\*.trc"""
+"4.6","컨트롤, Redo, 데이터 파일 접근 제한 (자동 진단)","양호","양호: 불필요 그룹 권한이 확인되지 않았습니다.","icacls <각 파일 경로>
+...
+..."
+"4.7","$TNS_ADMIN 파일 접근 제한 (자동 진단)","양호","양호: 불필요 그룹 권한이 확인되지 않았습니다.",""
+"4.8","감사 로그 파일 접근 제한 (자동 진단)","양호","양호: 불필요 그룹 권한이 확인되지 않았습니다.","icacls ""C:\app\Administrator\product\21c\admin\XE\adump""
+...
+...  icacls ""C:\app\Administrator\product\21c\admin\XE\adump\*.*"""
+"5.1","보안 패치 적용 현황 (OPatch lsinventory)","취약","취약 - 적용된 패치가 확인되지 않음 (Interim 0건).",""
+"6.1","SYS 감사 수행 설정 (AUDIT_SYS_OPERATIONS)","양호","양호: SYS 감사 수행이 활성화되어 있습니다.",""
+"6.2","Audit Trail 기록 설정 (AUDIT_TRAIL)","양호","양호: 감사가 활성화되어 있습니다.",""
