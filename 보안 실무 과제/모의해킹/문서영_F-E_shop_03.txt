@@ -1,0 +1,23 @@
+==================================
+* 쇼핑몰 문제 04번
+==================================
+[풀이과정]
+
+1. 풀이과정
+1> 
+
+2. 정답
+
+==================================
+
+POST /practice/practice03/login HTTP/1.1
+_csrf=0c844f6d-e6de-4b73-8559-695ebbbce7e2&memberid=admin&password=1234
+| -> csrf: 변하는 값
+V
+HTTP/1.1 302 
+Set-Cookie: JSESSIONID=0C79CE5734111739DC0228F992052BE8; Path=/; Secure; HttpOnly
+
+GET /practice/practice03/login?error > Cookie: JSESSIONID=75067CFAC2A9BC9A0937ECC7EA5F1DCB
+|
+V
+GET /member/login HTTP/1.1

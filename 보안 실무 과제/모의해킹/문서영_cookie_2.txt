@@ -1,0 +1,4 @@
+1. Cookie의 sessionID=ZXFzdDcxNjU5NQ%3D%3D값을 확인했을 때, 인코딩되어있는 것 같은 모습을 확인할 수 있다. 
+2. 현재 가진 쿠키를 url 디코딩하면 ZXFzdDcxNjU5NQ==의 값이 나오고 이 값을 Base64로 디코딩하면 eqst716595의 값을 얻게 된다.
+3. 현재 eqst716595의 세션ID와 힌트의 eqst001004를 비교하면 들어온 순서라는 것을 추측할 수 있다.
+4. eqst001004를 Base64로 인코딩한 값, ZXFzdDAwMTAwNA==를 sessionID에 넣어주면 Flag를 찾을 수 있다.

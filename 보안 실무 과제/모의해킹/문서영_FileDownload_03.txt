@@ -1,0 +1,16 @@
+==================================
+* 파일 다운로드 문제 03번
+==================================
+[풀이과정]
+
+1. 풀이과정
+1> /answer3/down.txt 다운 받기!!
+
+2> 파일 경로 추측하기
+https://lab.eqst.co.kr:8088/exam28/down/download2.php?file_path=/file/faq/afaf.php
+
+2. 정답
+file_filter
+==================================
+
+https://lab.eqst.co.kr:8087/exam27/file/faq/afaf.php

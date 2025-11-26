@@ -1,0 +1,52 @@
+==================================
+* 파일 다운로드 문제 05번
+==================================
+[풀이과정]
+
+1. 풀이과정
+파일 업로드를 할 때 버프로 잡아서 파일 이름에 대한 타입을 변경해줬다.
+------WebKitFormBoundary1GZOuc7tAy4wk6VC
+Content-Disposition: form-data; name="fileupload"; filename="images.php"
+Content-Type: image/png
+
+php
+
+2. 정답
+contenttype
+==================================
+
+
+==================================
+* 파일 다운로드 문제 06번
+==================================
+[풀이과정]
+
+1. 풀이과정
+파일 업로드를 할 때 버프로 잡아서 파일 이름에 대한 타입을 변경해줬다.
+------WebKitFormBoundaryHYbDAICSE6yV4VST
+Content-Disposition: form-data; name="fileupload"; filename="images.php"
+Content-Type: image/png
+
+PNG
+
+2. 정답
+server_upload
+==================================
+
+
+==================================
+* 파일 다운로드 문제 07번
+==================================
+[풀이과정]
+
+1. 풀이과정
+파일 업로드를 할 때 버프로 잡아서 파일 이름에 대한 타입을 변경해줬다.
+------WebKitFormBoundarys0C3LkwKHMlPsg6k
+Content-Disposition: form-data; name="fileupload"; filename="images.php"
+Content-Type: image/png
+
+PNG
+
+2. 정답
+lower_upload
+==================================
